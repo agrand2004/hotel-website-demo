@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Room {
+  id            String    @id @default(cuid())
+  name          String
+  type          String
+  description   String
+  capacity      Int
+  pricePerNight Int // CHF
+  imageUrl      String
+  bookings      Booking[]
+}
+
+model Booking {
+  id         String        @id @default(cuid())
+  reference  String        @unique
+  roomId     String
+  room       Room          @relation(fields: [roomId], references: [id])
+  checkIn    DateTime      @db.Date
+  checkOut   DateTime      @db.Date
+  adults     Int
+  totalPrice Int // CHF
+  status     BookingStatus @default(pending)
+  holdUntil  DateTime? // only meaningful while pending
+  guestName  String
+  guestEmail String
+  guestPhone String
+  createdAt  DateTime      @default(now())
+
+  @@index([roomId, checkIn, checkOut])
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  expired
+}

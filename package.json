@@ -1,0 +1,17 @@
+{
+  "name": "hotel-website-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter \"./apps/*\" dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @hotel/api db:migrate",
+    "db:seed": "pnpm --filter @hotel/api db:seed"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}
