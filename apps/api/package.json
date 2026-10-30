@@ -9,7 +9,8 @@
     "build": "tsc -p tsconfig.json",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx --env-file=../../.env prisma/seed.ts"
+    "db:seed": "tsx --env-file=../../.env prisma/seed.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.0",
@@ -24,6 +25,7 @@
     "@types/node": "^24.0.0",
     "@types/pg": "^8.15.0",
     "prisma": "7.10.1",
-    "tsx": "^4.20.0"
+    "tsx": "^4.20.0",
+    "vitest": "^3.2.7"
   }
 }
