@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #f7f2e8;
+  --color-forest: #1f3d2e;
+  --font-serif: "Georgia", "Times New Roman", serif;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-forest);
+}
