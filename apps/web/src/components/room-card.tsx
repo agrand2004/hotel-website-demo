@@ -1,6 +1,7 @@
 import type { Room } from "@hotel/shared";
 import { Link } from "react-router-dom";
 import { formatChf } from "../lib/format";
+import { roomImageSrcSet } from "../lib/room-images";
 
 /** Summary card of a room in the search results inspired by Lingers suites catalog. */
 export function RoomCard(props: { room: Room; stayQuery: string }) {
@@ -12,6 +13,8 @@ export function RoomCard(props: { room: Room; stayQuery: string }) {
         <div className="relative aspect-[16/11] w-full overflow-hidden bg-[#FAF8F5]">
           <img
             src={room.imageUrl}
+            srcSet={roomImageSrcSet(room.imageUrl)}
+            sizes="(min-width: 1280px) 390px, (min-width: 1024px) calc((100vw - 112px) / 3), (min-width: 640px) calc((100vw - 80px) / 2), calc(100vw - 48px)"
             alt={room.name}
             loading="lazy"
             decoding="async"

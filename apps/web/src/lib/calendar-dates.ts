@@ -6,6 +6,15 @@ export function isCalendarDate(value: string | undefined): value is string {
   return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
+/** Validation for editable ISO date fields without the browser's native picker. */
+export function dateInputError(value: string, min: string, max = "9999-12-31"): string {
+  if (!value) return ""; // The required attribute handles empty inputs.
+  if (!isCalendarDate(value)) return "Enter a valid date in YYYY-MM-DD format.";
+  if (value < min) return `Choose a date on or after ${min}.`;
+  if (value > max) return `Choose a date on or before ${max}.`;
+  return "";
+}
+
 export function addDays(value: string, days: number): string {
   return new Date(Date.parse(`${value}T00:00:00Z`) + days * DAY_MS).toISOString().slice(0, 10);
 }

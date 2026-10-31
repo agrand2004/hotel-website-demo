@@ -1,5 +1,5 @@
 import { type KeyboardEvent, useId, useLayoutEffect, useRef, useState } from "react";
-import { addDays, isCalendarDate } from "../lib/calendar-dates";
+import { addDays, dateInputError, isCalendarDate } from "../lib/calendar-dates";
 import { formatDate, isoDateFromToday } from "../lib/format";
 import { DateCalendar } from "./date-calendar";
 import "./search-form.css";
@@ -26,7 +26,7 @@ export function SearchForm(props: { checkIn?: string; checkOut?: string; adults?
   const dialogId = useId();
   const titleId = useId();
   const fieldId = useId();
-  const calendarCheckIn = isCalendarDate(checkIn) && checkIn >= today ? checkIn : today;
+  const calendarCheckIn = checkIn && !dateInputError(checkIn, today, "9999-12-30") ? checkIn : today;
   const departureMin = addDays(calendarCheckIn, 1);
   const calendarCheckOut = isCalendarDate(checkOut) && checkOut >= departureMin ? checkOut : departureMin;
 
@@ -68,7 +68,7 @@ export function SearchForm(props: { checkIn?: string; checkOut?: string; adults?
   function updateDate(field: "checkIn" | "checkOut", date: string) {
     if (field === "checkIn") {
       setCheckIn(date);
-      if (isCalendarDate(date) && date >= today && date >= checkOut) setCheckOut(addDays(date, 1));
+      if (date && !dateInputError(date, today, "9999-12-30") && date >= checkOut) setCheckOut(addDays(date, 1));
     } else {
       setCheckOut(date);
     }
@@ -102,12 +102,14 @@ export function SearchForm(props: { checkIn?: string; checkOut?: string; adults?
         const date = field === "checkIn" ? checkIn : checkOut;
         const label = field === "checkIn" ? "Arrival" : "Departure";
         const valid = isCalendarDate(date);
+        const min = field === "checkIn" ? today : departureMin;
+        const error = dateInputError(date, min, field === "checkIn" ? "9999-12-30" : "9999-12-31");
         return (
           <div key={field} className="stay-field" data-expanded={picker === field || undefined}>
             <label htmlFor={`${fieldId}-${field}`} className="stay-field-label">{label}</label>
             <button type="button" className="stay-picker-trigger" aria-label={`${label}, ${valid ? formatDate(date) : "choose a date"}`} aria-haspopup="dialog" aria-controls={dialogId} aria-expanded={picker === field} onClick={(event) => openPicker(field, event.currentTarget)}><Chevron /></button>
             <div className="stay-field-value stay-date-value">
-              <input id={`${fieldId}-${field}`} type="date" name={field} value={date} min={field === "checkIn" ? today : departureMin} max="9999-12-31" required className="stay-date-input" onChange={(event) => updateDate(field, event.target.value)} onKeyDown={(event) => {
+              <input id={`${fieldId}-${field}`} type="text" name={field} value={date} pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" maxLength={10} placeholder="YYYY-MM-DD" autoComplete="off" spellCheck={false} required aria-invalid={!!error || undefined} aria-describedby={`${fieldId}-help`} title={`YYYY-MM-DD, on or after ${min}`} ref={(input) => { input?.setCustomValidity(error); }} className="stay-date-input" onChange={(event) => updateDate(field, event.target.value)} onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " " || event.altKey && event.key === "ArrowDown") {
                   event.preventDefault();
                   openPicker(field, event.currentTarget);
@@ -131,6 +133,7 @@ export function SearchForm(props: { checkIn?: string; checkOut?: string; adults?
         </select>
       </div>
       <button type="submit" className="stay-search-submit"><span>Check availability</span><span aria-hidden="true">↗</span></button>
+      <p id={`${fieldId}-help`} className="sr-only">Enter a date as YYYY-MM-DD, or use the calendar button. Enter or Alt + Down Arrow opens the calendar; Escape closes it.</p>
 
       <dialog ref={dialogRef} id={dialogId} className={`stay-picker${picker === "adults" ? " guest-picker" : ""}`} aria-labelledby={titleId} data-lenis-prevent onKeyDown={keepFocusInPicker} onCancel={(event) => { event.preventDefault(); setPicker(null); }} onClick={(event) => {
         if (event.target !== event.currentTarget) return;

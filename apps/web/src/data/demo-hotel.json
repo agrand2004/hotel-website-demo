@@ -12,7 +12,7 @@
       "capacity": 1,
       "pricePerNight": 120,
       "description": "A quiet single room facing the courtyard.",
-      "imageUrl": "/rooms/cosy-single.jpg"
+      "imageUrl": "/rooms/cosy-single-1200.webp"
     },
     {
       "id": "courtyard-single",
@@ -21,7 +21,7 @@
       "capacity": 1,
       "pricePerNight": 135,
       "description": "A single room with a writing desk and garden view.",
-      "imageUrl": "/rooms/courtyard-single.jpg"
+      "imageUrl": "/rooms/courtyard-single-1200.webp"
     },
     {
       "id": "classic-double",
@@ -30,7 +30,7 @@
       "capacity": 2,
       "pricePerNight": 180,
       "description": "A queen bed, rain shower and a view over the old town.",
-      "imageUrl": "/rooms/classic-double.jpg"
+      "imageUrl": "/rooms/classic-double-1200.webp"
     },
     {
       "id": "superior-double",
@@ -39,7 +39,7 @@
       "capacity": 2,
       "pricePerNight": 210,
       "description": "A spacious double with a reading corner and natural linen.",
-      "imageUrl": "/rooms/superior-double.jpg"
+      "imageUrl": "/rooms/superior-double-1200.webp"
     },
     {
       "id": "rhine-view-double",
@@ -48,7 +48,7 @@
       "capacity": 2,
       "pricePerNight": 240,
       "description": "A double room with a balcony over the Rhine.",
-      "imageUrl": "/rooms/rhine-view-double.jpg"
+      "imageUrl": "/rooms/rhine-view-double-1200.webp"
     },
     {
       "id": "twin-room",
@@ -57,7 +57,7 @@
       "capacity": 2,
       "pricePerNight": 170,
       "description": "Two single beds, ideal for colleagues and friends.",
-      "imageUrl": "/rooms/twin-room.jpg"
+      "imageUrl": "/rooms/twin-room-1200.webp"
     },
     {
       "id": "family-room",
@@ -66,7 +66,7 @@
       "capacity": 4,
       "pricePerNight": 290,
       "description": "Two connected sleeping areas for up to four guests.",
-      "imageUrl": "/rooms/family-room.jpg"
+      "imageUrl": "/rooms/family-room-1200.webp"
     },
     {
       "id": "family-suite",
@@ -75,7 +75,7 @@
       "capacity": 4,
       "pricePerNight": 340,
       "description": "A lounge, two bedrooms and a bathtub for unhurried evenings.",
-      "imageUrl": "/rooms/family-suite.jpg"
+      "imageUrl": "/rooms/family-suite-1200.webp"
     },
     {
       "id": "junior-suite",
@@ -84,7 +84,7 @@
       "capacity": 2,
       "pricePerNight": 320,
       "description": "A generous lounge area and a king-size bed.",
-      "imageUrl": "/rooms/junior-suite.jpg"
+      "imageUrl": "/rooms/junior-suite-1200.webp"
     },
     {
       "id": "rhine-penthouse-suite",
@@ -93,7 +93,7 @@
       "capacity": 3,
       "pricePerNight": 450,
       "description": "A top-floor suite with a private terrace.",
-      "imageUrl": "/rooms/rhine-penthouse-suite.jpg"
+      "imageUrl": "/rooms/rhine-penthouse-suite-1200.webp"
     }
   ],
   "unavailableStays": [

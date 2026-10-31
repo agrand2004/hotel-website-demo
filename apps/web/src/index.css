@@ -69,17 +69,6 @@ p {
   font-family: var(--font-sans);
 }
 
-/* Custom indicator for date inputs */
-input[type="date"]::-webkit-calendar-picker-indicator {
-  opacity: 0.5;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
-}
-
 /* Rheinblick's editorial home: a sequence of photographs, rather than panels. */
 html { scroll-behavior: auto; scroll-padding-top: 110px; }
 a, button, summary { -webkit-tap-highlight-color: transparent; }

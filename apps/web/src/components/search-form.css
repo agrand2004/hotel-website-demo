@@ -11,13 +11,11 @@ html { scrollbar-gutter: stable; }
 .stay-field:hover, .stay-field[data-expanded] { background: var(--color-sand); }
 .stay-field:focus-within, .stay-search-submit:focus-visible { outline: 2px solid var(--color-bronze); outline-offset: -5px; }
 .stay-picker-trigger:focus-visible, .stay-date-input:focus-visible, .stay-guest-input:focus-visible { outline: none; }
-/* Keep the editorial date display at rest and expose the native editor on focus. */
+/* Keep the editorial date display at rest and reveal the ISO text field on focus. */
 .stay-date-value { position: relative; }
 .stay-date-display { display: flex; align-items: baseline; gap: inherit; pointer-events: none; }
 .stay-date-input { position: absolute; inset: 0; width: 100%; min-width: 0; padding: 0; border: 0; background: transparent; font: inherit; color: transparent; outline: none; }
-.stay-date-input::-webkit-calendar-picker-indicator { display: none; }
-.stay-date-input::-webkit-datetime-edit { padding: 0; }
-.stay-date-input:focus { color: var(--color-ink); }
+.stay-date-input:focus { color: var(--color-ink); font-size: 16px; }
 .stay-date-input:focus + .stay-date-display { visibility: hidden; }
 .stay-guest-input { appearance: none; width: 100%; min-width: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; outline: none; cursor: pointer; }
 .stay-search-submit { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 96px; padding: 22px 28px; background: var(--color-bronze); color: var(--color-canvas); font: 400 14px/1.5 var(--font-sans); text-align: left; cursor: pointer; transition: background .18s; }

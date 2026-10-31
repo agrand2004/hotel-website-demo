@@ -2,6 +2,7 @@ import type { Room } from "@hotel/shared";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { formatChf, formatDate, isoDateFromToday } from "../lib/format";
 import { useApiResource } from "../lib/use-api-resource";
+import { roomImageSrcSet } from "../lib/room-images";
 
 const DEFAULT_CHECK_IN_OFFSET_DAYS = 14;
 const DEFAULT_STAY_NIGHTS = 2;
@@ -69,6 +70,8 @@ export function RoomDetailPage() {
             <div className="aspect-[16/11] overflow-hidden bg-[#FAF8F5]">
               <img
                 src={room.imageUrl}
+                srcSet={roomImageSrcSet(room.imageUrl)}
+                sizes="(min-width: 1280px) 700px, (min-width: 1024px) 58vw, calc(100vw - 64px)"
                 alt={room.name}
                 decoding="async"
                 className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-103"
