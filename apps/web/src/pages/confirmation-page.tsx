@@ -1,5 +1,5 @@
 import type { Booking } from "@hotel/shared";
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { BookingSummary } from "../components/booking-summary";
 import { ApiError, apiPost } from "../lib/api";
@@ -13,7 +13,8 @@ export function ConfirmationPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
 
-  async function handleConfirm() {
+  async function handleConfirm(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (confirming) return;
     setConfirming(true);
     setErrorMessage(null);
@@ -114,7 +115,8 @@ export function ConfirmationPage() {
       )}
 
       {booking.status === "pending" && (
-        <div className="bg-white border border-[#1F1E1D]/15 p-8 sm:p-10 shadow-lg shadow-black/5 space-y-6">
+        <form method="post" onSubmit={handleConfirm} aria-label="Confirm reservation" className="bg-white border border-[#1F1E1D]/15 p-8 sm:p-10 shadow-lg shadow-black/5 space-y-6">
+          <input type="hidden" name="bookingId" value={booking.id} />
           <div className="space-y-2 text-xs text-[#6C6862] leading-relaxed font-light border-b border-[#1F1E1D]/10 pb-5">
             <span className="font-brand text-[10px] uppercase tracking-[0.24em] text-[#8F7255] font-semibold block">
               Safe By Design Policy
@@ -138,15 +140,14 @@ export function ConfirmationPage() {
               Browse other rooms
             </Link>
             <button
-              type="button"
-              onClick={handleConfirm}
+              type="submit"
               disabled={confirming}
               className="bg-[#1F1E1D] hover:bg-[#8F7255] text-[#FAF8F5] px-8 py-4 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors duration-300 disabled:opacity-50 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F1E1D] text-center"
             >
               {confirming ? "Confirming…" : "Confirm Reservation (Free Demo) →"}
             </button>
           </div>
-        </div>
+        </form>
       )}
 
       {isConfirmed && (

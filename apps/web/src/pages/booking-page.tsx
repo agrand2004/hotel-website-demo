@@ -1,5 +1,5 @@
 import type { Booking, Room } from "@hotel/shared";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useId, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ApiError, apiPost } from "../lib/api";
 import { formatChf, formatDate } from "../lib/format";
@@ -18,6 +18,7 @@ export function BookingPage() {
   const room = useApiResource<{ room: Room }>(roomId ? `/api/rooms/${roomId}?${stayQuery}` : null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const guestHelpId = useId();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,10 +28,10 @@ export function BookingPage() {
     setErrorMessage(null);
     try {
       const { booking } = await apiPost<{ booking: Booking }>("/api/bookings", {
-        roomId,
-        checkIn,
-        checkOut,
-        adults,
+        roomId: form.get("roomId"),
+        checkIn: form.get("checkIn"),
+        checkOut: form.get("checkOut"),
+        adults: Number(form.get("adults")),
         guestName: form.get("guestName"),
         guestEmail: form.get("guestEmail"),
         guestPhone: form.get("guestPhone"),
@@ -100,10 +101,14 @@ export function BookingPage() {
       )}
 
       {/* Semantic Form */}
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white border border-[#1F1E1D]/15 p-8 sm:p-10 shadow-lg shadow-black/5" aria-label="Guest details">
+      <form method="post" onSubmit={handleSubmit} className="space-y-6 bg-white border border-[#1F1E1D]/15 p-8 sm:p-10 shadow-lg shadow-black/5" aria-label="Guest details">
+        <input type="hidden" name="roomId" value={roomId} />
+        <input type="hidden" name="checkIn" value={checkIn} />
+        <input type="hidden" name="checkOut" value={checkOut} />
+        <input type="hidden" name="adults" value={adults} />
         <div className="space-y-1 border-b border-[#1F1E1D]/10 pb-4">
           <h2 className="font-serif text-2xl font-light text-[#1F1E1D]">Lead Guest Information</h2>
-          <p className="text-xs text-[#6C6862] font-light leading-relaxed">A fictional guest is prefilled for this demonstration. No personal information is needed.</p>
+          <p id={guestHelpId} className="text-xs text-[#6C6862] font-light leading-relaxed">A demo guest is prefilled. You can edit these details; use fictitious information only.</p>
         </div>
 
         <div className="space-y-5">
@@ -115,7 +120,7 @@ export function BookingPage() {
               required
               autoComplete="off"
               defaultValue={DEMO_GUEST.guestName}
-              readOnly
+              aria-describedby={guestHelpId}
               className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-sm font-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
             />
           </label>
@@ -128,7 +133,7 @@ export function BookingPage() {
               required
               autoComplete="off"
               defaultValue={DEMO_GUEST.guestEmail}
-              readOnly
+              aria-describedby={guestHelpId}
               className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-sm font-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
             />
           </label>
@@ -141,7 +146,7 @@ export function BookingPage() {
               required
               autoComplete="off"
               defaultValue={DEMO_GUEST.guestPhone}
-              readOnly
+              aria-describedby={guestHelpId}
               className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-sm font-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
             />
           </label>

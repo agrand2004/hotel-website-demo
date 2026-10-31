@@ -97,9 +97,6 @@ export function createDemoHotel(storage?: DemoStorage, now: () => number = Date.
     const parsed = createBookingBodySchema.safeParse(input);
     if (!parsed.success) fail(400, "invalid_booking", "Please select a room, valid dates and the demo guest details.");
     const body = parsed.data;
-    if (body.guestName !== DEMO_GUEST.guestName || body.guestEmail !== DEMO_GUEST.guestEmail || body.guestPhone !== DEMO_GUEST.guestPhone) {
-      fail(400, "demo_guest_required", "Please use the prefilled fictional guest details for this demo.");
-    }
     const room = getRoom(body.roomId, body);
     const nights = (dateMs(body.checkOut) - dateMs(body.checkIn)) / DAY_MS;
     const id = crypto.randomUUID();
@@ -108,7 +105,7 @@ export function createDemoHotel(storage?: DemoStorage, now: () => number = Date.
       checkIn: body.checkIn, checkOut: body.checkOut, adults: body.adults,
       nights, totalPrice: nights * room.pricePerNight,
       status: "pending", holdUntil: new Date(now() + HOLD_MS).toISOString(),
-      ...DEMO_GUEST,
+      guestName: body.guestName, guestEmail: body.guestEmail, guestPhone: body.guestPhone,
     };
     bookings.push(booking);
     persist();

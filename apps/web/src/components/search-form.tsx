@@ -22,9 +22,13 @@ export function SearchForm(props: { checkIn?: string; checkOut?: string; adults?
   });
   const [picker, setPicker] = useState<Picker | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
   const dialogId = useId();
   const titleId = useId();
+  const fieldId = useId();
+  const calendarCheckIn = isCalendarDate(checkIn) && checkIn >= today ? checkIn : today;
+  const departureMin = addDays(calendarCheckIn, 1);
+  const calendarCheckOut = isCalendarDate(checkOut) && checkOut >= departureMin ? checkOut : departureMin;
 
   useLayoutEffect(() => {
     if (!picker) return;
@@ -37,7 +41,7 @@ export function SearchForm(props: { checkIn?: string; checkOut?: string; adults?
 
     function position() {
       if (!trigger) return;
-      const anchor = trigger.getBoundingClientRect();
+      const anchor = (trigger.closest(".stay-field") ?? trigger).getBoundingClientRect();
       const panel = dialog.getBoundingClientRect();
       const left = Math.max(12, Math.min(anchor.left, innerWidth - panel.width - 12));
       let top = anchor.bottom + 8;
@@ -56,19 +60,18 @@ export function SearchForm(props: { checkIn?: string; checkOut?: string; adults?
     };
   }, [picker]);
 
-  function openPicker(field: Picker, trigger: HTMLButtonElement) {
+  function openPicker(field: Picker, trigger: HTMLElement) {
     triggerRef.current = trigger;
     setPicker(field);
   }
 
-  function selectDate(date: string) {
-    if (picker === "checkIn") {
+  function updateDate(field: "checkIn" | "checkOut", date: string) {
+    if (field === "checkIn") {
       setCheckIn(date);
-      if (date >= checkOut) setCheckOut(addDays(date, 1));
+      if (isCalendarDate(date) && date >= today && date >= checkOut) setCheckOut(addDays(date, 1));
     } else {
       setCheckOut(date);
     }
-    setPicker(null);
   }
 
   function moveGuestFocus(event: KeyboardEvent<HTMLButtonElement>, guest: number) {
@@ -95,27 +98,38 @@ export function SearchForm(props: { checkIn?: string; checkOut?: string; adults?
 
   return (
     <form action="/rooms" method="get" className="stay-form" aria-label="Search available rooms" data-ui>
-      {/* Preserve the named native fields for form submission and site analysis. */}
-      <input hidden type="date" name="checkIn" value={checkIn} min={today} readOnly />
-      <input hidden type="date" name="checkOut" value={checkOut} min={addDays(checkIn, 1)} readOnly />
-      <select hidden name="adults" value={adults} onChange={(event) => setAdults(Number(event.target.value))} aria-label="Number of guests">
-        {Array.from({ length: MAX_ADULTS }, (_, index) => <option key={index + 1} value={index + 1}>{index + 1}</option>)}
-      </select>
-
       {(["checkIn", "checkOut"] as const).map((field) => {
         const date = field === "checkIn" ? checkIn : checkOut;
         const label = field === "checkIn" ? "Arrival" : "Departure";
+        const valid = isCalendarDate(date);
         return (
-          <button key={field} type="button" className="stay-field" aria-label={`${label}, ${formatDate(date)}`} aria-haspopup="dialog" aria-controls={dialogId} aria-expanded={picker === field} onClick={(event) => openPicker(field, event.currentTarget)}>
-            <span className="stay-field-label">{label}</span><Chevron />
-            <span className="stay-field-value">{SHORT_DATE.format(new Date(`${date}T00:00:00Z`))}<small>{date.slice(0, 4)}</small></span>
-          </button>
+          <div key={field} className="stay-field" data-expanded={picker === field || undefined}>
+            <label htmlFor={`${fieldId}-${field}`} className="stay-field-label">{label}</label>
+            <button type="button" className="stay-picker-trigger" aria-label={`${label}, ${valid ? formatDate(date) : "choose a date"}`} aria-haspopup="dialog" aria-controls={dialogId} aria-expanded={picker === field} onClick={(event) => openPicker(field, event.currentTarget)}><Chevron /></button>
+            <div className="stay-field-value stay-date-value">
+              <input id={`${fieldId}-${field}`} type="date" name={field} value={date} min={field === "checkIn" ? today : departureMin} max="9999-12-31" required className="stay-date-input" onChange={(event) => updateDate(field, event.target.value)} onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " " || event.altKey && event.key === "ArrowDown") {
+                  event.preventDefault();
+                  openPicker(field, event.currentTarget);
+                }
+              }} />
+              <span className="stay-date-display" aria-hidden="true">{valid ? SHORT_DATE.format(new Date(`${date}T00:00:00Z`)) : "Choose date"}{valid && <small>{date.slice(0, 4)}</small>}</span>
+            </div>
+          </div>
         );
       })}
-      <button type="button" className="stay-field stay-guests" aria-label={`Guests, ${adults} ${adults === 1 ? "guest" : "guests"}`} aria-haspopup="dialog" aria-controls={dialogId} aria-expanded={picker === "adults"} onClick={(event) => openPicker("adults", event.currentTarget)}>
-        <span className="stay-field-label">Guests</span><Chevron />
-        <span className="stay-field-value">{adults} {adults === 1 ? "guest" : "guests"}</span>
-      </button>
+      <div className="stay-field stay-guests" data-expanded={picker === "adults" || undefined}>
+        <label htmlFor={`${fieldId}-adults`} className="stay-field-label">Guests</label>
+        <button type="button" className="stay-picker-trigger" aria-label={`Guests, ${adults} ${adults === 1 ? "guest" : "guests"}`} aria-haspopup="dialog" aria-controls={dialogId} aria-expanded={picker === "adults"} onClick={(event) => openPicker("adults", event.currentTarget)}><Chevron /></button>
+        <select id={`${fieldId}-adults`} name="adults" className="stay-field-value stay-guest-input" value={adults} required onChange={(event) => setAdults(Number(event.target.value))} onPointerDown={(event) => { event.preventDefault(); openPicker("adults", event.currentTarget); }} onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " " || event.altKey && event.key === "ArrowDown") {
+            event.preventDefault();
+            openPicker("adults", event.currentTarget);
+          }
+        }}>
+          {Array.from({ length: MAX_ADULTS }, (_, index) => <option key={index + 1} value={index + 1}>{index + 1} {index === 0 ? "guest" : "guests"}</option>)}
+        </select>
+      </div>
       <button type="submit" className="stay-search-submit"><span>Check availability</span><span aria-hidden="true">↗</span></button>
 
       <dialog ref={dialogRef} id={dialogId} className={`stay-picker${picker === "adults" ? " guest-picker" : ""}`} aria-labelledby={titleId} data-lenis-prevent onKeyDown={keepFocusInPicker} onCancel={(event) => { event.preventDefault(); setPicker(null); }} onClick={(event) => {
@@ -138,7 +152,7 @@ export function SearchForm(props: { checkIn?: string; checkOut?: string; adults?
               ))}
             </div>
           ) : (
-            <DateCalendar key={picker} value={picker === "checkIn" ? checkIn : checkOut} min={picker === "checkIn" ? today : addDays(checkIn, 1)} today={today} checkIn={checkIn} checkOut={checkOut} onSelect={selectDate} />
+            <DateCalendar key={picker} value={picker === "checkIn" ? calendarCheckIn : calendarCheckOut} min={picker === "checkIn" ? today : departureMin} today={today} checkIn={calendarCheckIn} checkOut={calendarCheckOut} onSelect={(date) => { updateDate(picker, date); setPicker(null); }} />
           )}</div>
         </>}
       </dialog>
