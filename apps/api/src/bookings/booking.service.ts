@@ -37,6 +37,21 @@ function toBooking(row: BookingWithRoom): Booking {
 }
 
 /**
+ * Lists every booking, newest first. A pending booking whose hold has lapsed is reported as `expired`,
+ * even though its row is only flipped when someone tries to confirm it.
+ * @returns all bookings with their room and guest details
+ */
+export async function listBookings(): Promise<Booking[]> {
+  const rows = await prisma.booking.findMany({ include: { room: true }, orderBy: { createdAt: "desc" } });
+  const now = new Date();
+  return rows.map((row) => {
+    const booking = toBooking(row);
+    const holdLapsed = row.status === "pending" && row.holdUntil !== null && row.holdUntil <= now;
+    return holdLapsed ? { ...booking, status: "expired", holdUntil: null } : booking;
+  });
+}
+
+/**
  * Creates a `pending` booking that holds the room for {@link HOLD_DURATION_MS}.
  * @param body - validated booking request
  * @returns the pending booking, to be confirmed by the guest
