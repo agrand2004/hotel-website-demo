@@ -41,7 +41,7 @@
 body {
   background: #FAF8F5;
   color: #1F1E1D;
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 1.125rem;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -82,10 +82,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 /* Rheinblick's editorial home: a sequence of photographs, rather than panels. */
 html { scroll-behavior: auto; scroll-padding-top: 110px; }
-body { font-family: var(--font-sans); }
 a, button, summary { -webkit-tap-highlight-color: transparent; }
 a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid #8F7255; outline-offset: 6px; }
-button, input, select { font: inherit; }
 .site-shell { min-height: 100vh; }
 .site-content { min-height: 50vh; }
 .skip-link { position: fixed; top: -100px; left: 20px; z-index: 100; background: #FAF8F5; color: #1F1E1D; padding: 12px 20px; }
@@ -105,15 +103,15 @@ button, input, select { font: inherit; }
 .nav-reserve span { margin-left: 18px; }
 .residence-home h1, .residence-home h2, .residence-home h3, .footer-goodbye { font-family: var(--font-serif); font-weight: 400; letter-spacing: -.035em; line-height: 1.1; }
 .residence-home h2 { font-size: clamp(44px, 5.2vw, 76px); text-wrap: balance; }
-.residence-home p { font-size: 15px; line-height: 1.85; }
+.residence-home p { font-size: 16px; line-height: 1.85; }
 .editorial-frame { width: 88%; max-width: 1400px; margin-inline: auto; }
 .residence-home figure { margin: 0; }
 .residence-home img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .residence-home figcaption { font-size: 13px; color: #57534D; padding-top: 14px; }
 .arrival-scene { height: min(900px, 92svh); min-height: 680px; position: relative; background: #181716; color: #FAF8F5; }
 .arrival-photograph { position: absolute; inset: 0; overflow: hidden; }
-.arrival-photograph::after { content: ""; position: absolute; inset: 0; background: rgb(15 18 17 / .38); }
-.arrival-photograph img { object-position: center 48%; animation: residence-arrival 1.8s var(--ease-expo) both; }
+.arrival-photograph::after { content: ""; position: absolute; inset: 0; background: rgb(15 18 17 / .46); }
+.arrival-photograph img { object-position: center 55%; }
 .arrival-copy { position: absolute; left: 8%; top: 32%; }
 .residence-home h1 { font-size: clamp(72px, 7.8vw, 112px); margin: 0; }
 .arrival-copy p { margin-top: 28px; color: #fff; }
@@ -182,9 +180,9 @@ button, input, select { font: inherit; }
 
 @media (max-width: 1000px) {
   .nav-explore { gap: 18px; } .residence-nav { padding-inline: 4%; gap: 12px; }
-  .residence-wordmark > span { font-size: 24px; } .residence-wordmark small { font-size: 11px; }
+  .residence-wordmark > span { font-size: 24px; }
   .residence-home h2 { font-size: 52px; }
-  .intro-title { grid-column: 1 / 7; } .intro-story { grid-column: 7 / 13; }
+  .intro-title { grid-column: 1 / 8; } .intro-story { grid-column: 8 / 13; }
   .intro-wide { height: 400px; } .intro-detail { grid-column: 9 / 13; padding-top: 90px; }
   .room-preview { grid-template-columns: 7fr 5fr; gap: 4%; }
   .room-preview h3 { font-size: 38px; }
@@ -196,16 +194,15 @@ button, input, select { font: inherit; }
   html { scroll-padding-top: 24px; }
   .residence-nav { height: 92px; padding-inline: 6%; grid-template-columns: 1fr auto; }
   .nav-explore { display: none; }
-  .residence-wordmark { align-items: start; gap: 3px; } .residence-wordmark > span { font-size: 22px; letter-spacing: .12em; } .residence-wordmark small { font-size: 10px; }
+  .residence-wordmark { align-items: start; gap: 3px; } .residence-wordmark > span { font-size: 20px; letter-spacing: .12em; }
   .nav-reserve { padding: 12px 14px; font-size: 13px; } .nav-reserve span { display: none; }
   .arrival-scene { min-height: 620px; height: 82svh; max-height: 800px; }
   .arrival-copy { left: 6%; top: 30%; right: 6%; }
   .residence-home h1 { font-size: clamp(42px, 14vw, 90px); }
-  .arrival-copy p { font-size: 14px; margin-top: 24px; }
+  .arrival-copy p { margin-top: 24px; }
   .arrival-location { display: none; } .arrival-scroll { bottom: 25px; }
   .stay-search { padding: 14px 6%; }
   .residence-home h2 { font-size: clamp(38px, 9.7vw, 52px); }
-  .residence-home p { font-size: 14px; }
   .residence-intro { padding-block: 75px; gap: 30px 14px; }
   .intro-title, .intro-story { grid-column: 1 / 13; } .intro-story { padding-top: 0; }
   .intro-wide { grid-column: 1 / 11; height: 310px; margin-top: 5px !important; }
@@ -243,22 +240,9 @@ button, input, select { font: inherit; }
   .arrival-photograph img, .room-preview-image img { animation: none; }
   .text-link svg, .solid-link svg { transition: none; }
 }
-/* Final optical adjustments, shared with the tablet composition. */
-.residence-home p { font-size: 16px; }
-.residence-wordmark small { font-size: 13px; }
 @media (min-width: 701px) and (max-width: 1000px) {
-  .intro-title { grid-column: 1 / 8; }
-  .intro-story { grid-column: 8 / 13; }
   .residence-home .intro-title h2 { font-size: 46px; }
 }
-@media (max-width: 700px) {
-  .residence-wordmark > span { font-size: 20px; }
-  .residence-wordmark small { font-size: 10px; }
-  .arrival-copy p { font-size: 16px; }
-}
-.arrival-photograph img { object-position: center 55%; }
-.arrival-photograph::after { background: rgb(15 18 17 / .46); }
-@media (max-width: 1000px) { .residence-wordmark small { font-size: 13px; } }
 
 /* Timed entrance; scroll reveals use IntersectionObserver across browsers. */
 @media (prefers-reduced-motion: no-preference) {

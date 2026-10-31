@@ -69,12 +69,12 @@ export function ConfirmationPage() {
       </div>
 
       {isConfirmed ? (
-        <div className="bg-white border border-[#1F1E1D]/15 p-8 sm:p-10 shadow-lg shadow-black/5 space-y-6">
-          <div className="flex items-center gap-4 border-b border-[#1F1E1D]/10 pb-6">
+        <div className="bg-white border border-[#1F1E1D]/15 p-5 sm:p-10 shadow-lg shadow-black/5 space-y-6">
+          <div className="flex items-start sm:items-center gap-4 border-b border-[#1F1E1D]/10 pb-6">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-[#1F1E1D] bg-[#1F1E1D] text-[#FAF8F5] text-sm">
               ✓
             </span>
-            <div>
+            <div className="min-w-0 [overflow-wrap:anywhere]">
               <p className="font-serif text-2xl sm:text-3xl font-light text-[#1F1E1D]">
                 Thank you, {booking.guestName}.
               </p>
@@ -83,12 +83,12 @@ export function ConfirmationPage() {
           </div>
 
           {/* Reference Voucher Card */}
-          <div className="bg-[#FAF8F5] border border-[#1F1E1D]/12 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-[#FAF8F5] border border-[#1F1E1D]/12 p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span className="text-[10px] uppercase tracking-[0.22em] text-[#8F7255] font-semibold block">
                 Demo Reference Code
               </span>
-              <span className="font-mono text-2xl font-medium text-[#1F1E1D] tracking-widest mt-1 block">
+              <span className="font-mono text-lg sm:text-2xl font-medium text-[#1F1E1D] tracking-wider mt-1 block break-all">
                 {booking.reference}
               </span>
             </div>
@@ -115,7 +115,7 @@ export function ConfirmationPage() {
       )}
 
       {booking.status === "pending" && (
-        <form method="post" onSubmit={handleConfirm} aria-label="Confirm reservation" className="bg-white border border-[#1F1E1D]/15 p-8 sm:p-10 shadow-lg shadow-black/5 space-y-6">
+        <form method="post" onSubmit={handleConfirm} aria-label="Confirm reservation" className="bg-white border border-[#1F1E1D]/15 p-5 sm:p-10 shadow-lg shadow-black/5 space-y-6">
           <input type="hidden" name="bookingId" value={booking.id} />
           <div className="space-y-2 text-xs text-[#6C6862] leading-relaxed font-light border-b border-[#1F1E1D]/10 pb-5">
             <span className="font-brand text-[10px] uppercase tracking-[0.24em] text-[#8F7255] font-semibold block">

@@ -118,7 +118,7 @@ export function RoomDetailPage() {
 
         {/* Right Column: Architectural Reservation Console */}
         <div className="lg:col-span-5 lg:sticky lg:top-28">
-          <div className="bg-white border border-[#1F1E1D]/15 p-8 shadow-lg shadow-black/5 space-y-6">
+          <div className="bg-white border border-[#1F1E1D]/15 p-5 sm:p-8 shadow-lg shadow-black/5 space-y-6">
             <div className="flex justify-between items-baseline border-b border-[#1F1E1D]/10 pb-5">
               <div>
                 <span className="text-[10px] uppercase tracking-[0.2em] text-[#8F7255] block font-medium">Nightly Rate</span>
@@ -129,11 +129,11 @@ export function RoomDetailPage() {
 
             {/* Stay Summary Panel */}
             <div className="bg-[#FAF8F5] border border-[#1F1E1D]/8 p-5 space-y-3.5 text-xs text-[#1F1E1D]">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-wrap justify-between items-center gap-2">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-[#6C6862] font-medium">Stay Dates</span>
                 <span className="font-medium text-[#1F1E1D]">{formatDate(checkIn)} — {formatDate(checkOut)}</span>
               </div>
-              <div className="flex justify-between items-center border-t border-[#1F1E1D]/8 pt-3">
+              <div className="flex flex-wrap justify-between items-center gap-2 border-t border-[#1F1E1D]/8 pt-3">
                 <span className="text-[10px] uppercase tracking-[0.18em] text-[#6C6862] font-medium">Guests</span>
                 <span className="font-medium text-[#1F1E1D]">{adults} {adults === "1" ? "Guest" : "Guests"} (Max {room.capacity})</span>
               </div>

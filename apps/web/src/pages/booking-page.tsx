@@ -80,15 +80,15 @@ export function BookingPage() {
       </div>
 
       {room.status === "success" && (
-        <div className="bg-white border border-[#1F1E1D]/12 p-7 shadow-sm space-y-4">
-          <div className="flex justify-between items-baseline border-b border-[#1F1E1D]/10 pb-4">
+        <div className="bg-white border border-[#1F1E1D]/12 p-5 sm:p-7 shadow-sm space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-baseline border-b border-[#1F1E1D]/10 pb-4">
             <div>
               <span className="text-[10px] uppercase tracking-[0.2em] text-[#8F7255] font-medium block">
                 Selected Suite
               </span>
               <p className="font-serif text-2xl font-light text-[#1F1E1D] mt-0.5">{room.data.room.name}</p>
             </div>
-            <span className="font-serif text-2xl text-[#1F1E1D] font-normal">
+            <span className="font-serif text-2xl text-[#1F1E1D] font-normal whitespace-nowrap">
               {formatChf(room.data.room.pricePerNight)} <span className="text-xs text-[#6C6862] font-sans font-light">/ night</span>
             </span>
           </div>
@@ -101,7 +101,7 @@ export function BookingPage() {
       )}
 
       {/* Semantic Form */}
-      <form method="post" onSubmit={handleSubmit} className="space-y-6 bg-white border border-[#1F1E1D]/15 p-8 sm:p-10 shadow-lg shadow-black/5" aria-label="Guest details">
+      <form method="post" onSubmit={handleSubmit} className="space-y-6 bg-white border border-[#1F1E1D]/15 p-5 sm:p-10 shadow-lg shadow-black/5" aria-label="Guest details">
         <input type="hidden" name="roomId" value={roomId} />
         <input type="hidden" name="checkIn" value={checkIn} />
         <input type="hidden" name="checkOut" value={checkOut} />
@@ -121,7 +121,7 @@ export function BookingPage() {
               autoComplete="off"
               defaultValue={DEMO_GUEST.guestName}
               aria-describedby={guestHelpId}
-              className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-sm font-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
+              className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-base sm:text-sm font-normal normal-case tracking-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
             />
           </label>
 
@@ -134,7 +134,7 @@ export function BookingPage() {
               autoComplete="off"
               defaultValue={DEMO_GUEST.guestEmail}
               aria-describedby={guestHelpId}
-              className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-sm font-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
+              className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-base sm:text-sm font-normal normal-case tracking-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
             />
           </label>
 
@@ -147,7 +147,7 @@ export function BookingPage() {
               autoComplete="off"
               defaultValue={DEMO_GUEST.guestPhone}
               aria-describedby={guestHelpId}
-              className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-sm font-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
+              className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-base sm:text-sm font-normal normal-case tracking-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
             />
           </label>
         </div>
