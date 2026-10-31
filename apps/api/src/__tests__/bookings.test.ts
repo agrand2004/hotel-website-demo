@@ -104,6 +104,29 @@ describe("bookings API (requires the seeded database)", () => {
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
+  it("lists bookings newest first with the guest details", async () => {
+    const { booking: older } = await (await createBooking()).json();
+    await prisma.booking.update({
+      where: { id: older.id },
+      data: { status: "expired", holdUntil: null, createdAt: new Date("2020-01-01T00:00:00Z") },
+    });
+    const { booking: newer } = await (await createBooking()).json();
+    const response = await app.request("/api/bookings");
+    const { bookings } = await response.json();
+    const ids = bookings.map((booking: { id: string }) => booking.id);
+    expect(response.status).toBe(200);
+    expect(ids.indexOf(newer.id)).toBeLessThan(ids.indexOf(older.id));
+    expect(bookings[ids.indexOf(newer.id)]).toMatchObject({ ...GUEST, reference: newer.reference, status: "pending" });
+  });
+
+  it("reports a pending booking whose hold has lapsed as expired", async () => {
+    const { booking } = await (await createBooking()).json();
+    await prisma.booking.update({ where: { id: booking.id }, data: { holdUntil: new Date(Date.now() - 1000) } });
+    const { bookings } = await (await app.request("/api/bookings")).json();
+    const listed = bookings.find((item: { id: string }) => item.id === booking.id);
+    expect(listed.status).toBe("expired");
+  });
+
   it("rejects a stay where check-out is not after check-in", async () => {
     const response = await postJson("/api/bookings", { roomId, ...STAY, checkOut: STAY.checkIn, ...GUEST });
     expect(response.status).toBe(400);
