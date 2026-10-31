@@ -7,7 +7,7 @@ type ApiResource<T> =
   | { status: "success"; data: T };
 
 /**
- * Loads a resource through the local demo adapter when `path` changes.
+ * Loads a JSON resource from the API when `path` changes.
  * @param path - API path starting with `/api`, or null to skip loading
  * @returns the loading / error / success state of the request
  */
@@ -29,7 +29,7 @@ export function useApiResource<T>(path: string | null): ApiResource<T> {
         const apiError =
           error instanceof ApiError
             ? error
-            : new ApiError({ status: 0, code: "demo_error", message: "Could not load this demo. Please try again." });
+            : new ApiError({ status: 0, code: "network_error", message: "Could not reach the server. Please try again." });
         setResult({ path, resource: { status: "error", error: apiError } });
       });
     return () => {

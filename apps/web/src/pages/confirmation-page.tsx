@@ -100,7 +100,6 @@ export function ConfirmationPage() {
 
           <div className="space-y-2 text-xs text-[#6C6862] leading-relaxed font-light pt-2">
             <p>No payment has been taken and no email has been sent.</p>
-            <p>This demonstration reservation is saved in this browser tab only.</p>
           </div>
         </div>
       ) : null}

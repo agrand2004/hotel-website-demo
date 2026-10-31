@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ApiError, apiPost } from "../lib/api";
 import { formatChf, formatDate } from "../lib/format";
 import { useApiResource } from "../lib/use-api-resource";
-import { DEMO_GUEST } from "../lib/demo-hotel";
+import { DEMO_GUEST } from "../lib/demo-guest";
 
 /** Guest details form; creates a pending booking then moves on to the confirmation review. */
 export function BookingPage() {
