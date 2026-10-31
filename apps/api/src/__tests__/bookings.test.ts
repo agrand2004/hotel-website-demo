@@ -1,6 +1,13 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { app } from "../app";
 import { prisma } from "../db";
+import { sendBookingConfirmationEmail } from "../email/booking-confirmation.sender";
+
+vi.mock("../email/booking-confirmation.sender", () => ({
+  sendBookingConfirmationEmail: vi.fn(),
+}));
+
+const sendEmail = vi.mocked(sendBookingConfirmationEmail);
 
 const STAY = { checkIn: "2030-06-10", checkOut: "2030-06-13", adults: 2 };
 const GUEST = { guestName: "Ada Test", guestEmail: "ada@example.test", guestPhone: "+41 00 000 00 00" };
@@ -26,6 +33,8 @@ describe("bookings API (requires the seeded database)", () => {
   });
 
   beforeEach(async () => {
+    sendEmail.mockReset();
+    sendEmail.mockResolvedValue(true);
     await prisma.booking.deleteMany({ where: { checkIn: new Date("2030-06-10T00:00:00Z") } });
   });
 
@@ -67,6 +76,32 @@ describe("bookings API (requires the seeded database)", () => {
     const body = await confirm.json();
     expect(confirm.status).toBe(200);
     expect(body.booking.status).toBe("confirmed");
+  });
+
+  it("sends the confirmation email once and records it", async () => {
+    const { booking } = await (await createBooking()).json();
+    const confirm = await postJson(`/api/bookings/${booking.id}/confirm`);
+    const body = await confirm.json();
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+    expect(sendEmail.mock.calls[0]?.[0]).toMatchObject({ id: booking.id, guestEmail: GUEST.guestEmail, status: "confirmed" });
+    expect(body.booking.confirmationEmailSent).toBe(true);
+    await postJson(`/api/bookings/${booking.id}/confirm`);
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+  });
+
+  it("still confirms the booking when the email cannot be sent", async () => {
+    sendEmail.mockResolvedValue(false);
+    const { booking } = await (await createBooking()).json();
+    const confirm = await postJson(`/api/bookings/${booking.id}/confirm`);
+    const body = await confirm.json();
+    expect(confirm.status).toBe(200);
+    expect(body.booking.status).toBe("confirmed");
+    expect(body.booking.confirmationEmailSent).toBe(false);
+  });
+
+  it("does not send an email for a booking that is not confirmed", async () => {
+    await createBooking();
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 
   it("rejects a stay where check-out is not after check-in", async () => {
