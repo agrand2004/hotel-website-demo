@@ -98,9 +98,27 @@ export function ConfirmationPage() {
             </div>
           </div>
 
-          <div className="space-y-2 text-xs text-[#6C6862] leading-relaxed font-light pt-2">
-            <p>No payment has been taken and no email has been sent.</p>
+          <div
+            role="status"
+            className="flex items-start gap-4 border border-[#1F1E1D]/12 bg-[#F3EFEA] p-4 sm:p-5"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="mt-0.5 h-5 w-5 shrink-0 text-[#8F7255]" fill="none" stroke="currentColor" strokeWidth="1.25">
+              <rect x="3" y="5" width="18" height="14" />
+              <path d="m3 6 9 7 9-7" />
+            </svg>
+            <div className="min-w-0 [overflow-wrap:anywhere]">
+              <span className="text-[10px] uppercase tracking-[0.22em] text-[#8F7255] font-semibold block">
+                {booking.confirmationEmailSent ? "Confirmation email sent" : "Confirmation email not sent"}
+              </span>
+              <p className="text-xs text-[#6C6862] leading-relaxed font-light mt-1">
+                {booking.confirmationEmailSent
+                  ? <>We have sent your booking details to <strong className="font-medium text-[#1F1E1D]">{booking.guestEmail}</strong>. If it does not arrive within a few minutes, check your spam folder.</>
+                  : "We could not send the confirmation email. Keep your reference code above: your reservation is confirmed."}
+              </p>
+            </div>
           </div>
+
+          <p className="text-xs text-[#6C6862] leading-relaxed font-light">No payment has been taken.</p>
         </div>
       ) : null}
 

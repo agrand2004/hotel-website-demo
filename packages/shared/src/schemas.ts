@@ -53,5 +53,6 @@ export const bookingSchema = z.object({
   guestName: z.string(),
   guestEmail: z.string(),
   guestPhone: z.string(),
+  confirmationEmailSent: z.boolean(),
 });
 export type Booking = z.infer<typeof bookingSchema>;

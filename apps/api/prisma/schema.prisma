@@ -19,20 +19,21 @@ model Room {
 }
 
 model Booking {
-  id         String        @id @default(cuid())
-  reference  String        @unique
-  roomId     String
-  room       Room          @relation(fields: [roomId], references: [id])
-  checkIn    DateTime      @db.Date
-  checkOut   DateTime      @db.Date
-  adults     Int
-  totalPrice Int // CHF
-  status     BookingStatus @default(pending)
-  holdUntil  DateTime? // only meaningful while pending
-  guestName  String
-  guestEmail String
-  guestPhone String
-  createdAt  DateTime      @default(now())
+  id                      String        @id @default(cuid())
+  reference               String        @unique
+  roomId                  String
+  room                    Room          @relation(fields: [roomId], references: [id])
+  checkIn                 DateTime      @db.Date
+  checkOut                DateTime      @db.Date
+  adults                  Int
+  totalPrice              Int // CHF
+  status                  BookingStatus @default(pending)
+  holdUntil               DateTime? // only meaningful while pending
+  guestName               String
+  guestEmail              String
+  guestPhone              String
+  confirmationEmailSentAt DateTime? // set once the confirmation email was accepted by Resend
+  createdAt               DateTime      @default(now())
 
   @@index([roomId, checkIn, checkOut])
 }

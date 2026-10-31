@@ -1,5 +1,6 @@
 import type { Booking, CreateBookingBody } from "@hotel/shared";
 import { prisma } from "../db";
+import { sendBookingConfirmationEmail } from "../email/booking-confirmation.sender";
 import { generateBookingReference } from "../lib/booking-reference";
 import { countNights, parseIsoDate, toIsoDate } from "../lib/dates";
 import { httpError } from "../lib/http-error";
@@ -31,6 +32,7 @@ function toBooking(row: BookingWithRoom): Booking {
     guestName: row.guestName,
     guestEmail: row.guestEmail,
     guestPhone: row.guestPhone,
+    confirmationEmailSent: row.confirmationEmailSentAt !== null,
   };
 }
 
@@ -109,5 +111,13 @@ export async function confirmBooking(id: string): Promise<Booking> {
     data: { status: "confirmed", holdUntil: null },
     include: { room: true },
   });
-  return toBooking(confirmed);
+  const booking = toBooking(confirmed);
+  const emailSent = await sendBookingConfirmationEmail(booking);
+  if (!emailSent) return booking;
+  const notified = await prisma.booking.update({
+    where: { id },
+    data: { confirmationEmailSentAt: new Date() },
+    include: { room: true },
+  });
+  return toBooking(notified);
 }
