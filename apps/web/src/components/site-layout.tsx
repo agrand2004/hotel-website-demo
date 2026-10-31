@@ -1,11 +1,13 @@
 import { useSmoothScroll } from "../lib/use-smooth-scroll";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { CursorHalo } from "./cursor-halo";
 
 export function SiteLayout() {
   useSmoothScroll();
   const isHome = useLocation().pathname === "/";
   return (
     <div className={`site-shell${isHome ? " is-home" : ""}`}>
+      <CursorHalo />
       <a href="#main-content" className="skip-link">Skip to content</a>
       <header className="residence-header">
         <nav className="residence-nav" aria-label="Main navigation">

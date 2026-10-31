@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ApiError, apiPost } from "../lib/api";
 import { formatChf, formatDate } from "../lib/format";
 import { useApiResource } from "../lib/use-api-resource";
+import { DEMO_GUEST } from "../lib/demo-hotel";
 
 /** Guest details form; creates a pending booking then moves on to the confirmation review. */
 export function BookingPage() {
@@ -13,12 +14,14 @@ export function BookingPage() {
   const checkIn = params.get("checkIn") ?? "";
   const checkOut = params.get("checkOut") ?? "";
   const adults = Number(params.get("adults") ?? "2");
-  const room = useApiResource<{ room: Room }>(roomId ? `/api/rooms/${roomId}` : null);
+  const stayQuery = new URLSearchParams({ checkIn, checkOut, adults: String(adults) }).toString();
+  const room = useApiResource<{ room: Room }>(roomId ? `/api/rooms/${roomId}?${stayQuery}` : null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitting || room.status !== "success") return;
     const form = new FormData(event.currentTarget);
     setSubmitting(true);
     setErrorMessage(null);
@@ -34,7 +37,7 @@ export function BookingPage() {
       });
       navigate(`/confirmation/${booking.id}`);
     } catch (error) {
-      setErrorMessage(error instanceof ApiError ? error.message : "Could not reach the server.");
+      setErrorMessage(error instanceof ApiError ? error.message : "Could not create the demo reservation. Please try again.");
       setSubmitting(false);
     }
   }
@@ -45,6 +48,19 @@ export function BookingPage() {
         <p className="font-serif text-2xl font-light text-[#1F1E1D]">Please select your dates and suite first.</p>
         <Link to="/rooms" className="inline-block text-[11px] uppercase tracking-[0.2em] text-[#1F1E1D] underline">
           ← Browse accommodations
+        </Link>
+      </main>
+    );
+  }
+
+  if (room.status !== "success") {
+    return (
+      <main className="mx-auto max-w-2xl px-6 py-20 space-y-4">
+        <p role={room.status === "error" ? "alert" : "status"} className="text-sm text-[#6C6862]">
+          {room.status === "error" ? room.error.message : "Checking your selected room…"}
+        </p>
+        <Link to={`/rooms?${stayQuery}`} className="inline-block text-[11px] uppercase tracking-[0.2em] text-[#1F1E1D] underline">
+          ← Choose a room
         </Link>
       </main>
     );
@@ -87,30 +103,32 @@ export function BookingPage() {
       <form onSubmit={handleSubmit} className="space-y-6 bg-white border border-[#1F1E1D]/15 p-8 sm:p-10 shadow-lg shadow-black/5" aria-label="Guest details">
         <div className="space-y-1 border-b border-[#1F1E1D]/10 pb-4">
           <h2 className="font-serif text-2xl font-light text-[#1F1E1D]">Lead Guest Information</h2>
-          <p className="text-xs text-[#6C6862] font-light">Please provide the reservation holder details.</p>
+          <p className="text-xs text-[#6C6862] font-light leading-relaxed">A fictional guest is prefilled for this demonstration. No personal information is needed.</p>
         </div>
 
         <div className="space-y-5">
           <label className="flex flex-col text-[10px] uppercase tracking-[0.22em] font-medium text-[#8F7255] cursor-pointer">
-            <span className="mb-2">Full Legal Name</span>
+            <span className="mb-2">Guest name</span>
             <input
               name="guestName"
               type="text"
               required
-              autoComplete="name"
-              placeholder="e.g. Marie Laurent"
+              autoComplete="off"
+              defaultValue={DEMO_GUEST.guestName}
+              readOnly
               className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-sm font-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
             />
           </label>
 
           <label className="flex flex-col text-[10px] uppercase tracking-[0.22em] font-medium text-[#8F7255] cursor-pointer">
-            <span className="mb-2">Email Address (for confirmation voucher)</span>
+            <span className="mb-2">Demo email address</span>
             <input
               name="guestEmail"
               type="email"
               required
-              autoComplete="email"
-              placeholder="marie.laurent@example.ch"
+              autoComplete="off"
+              defaultValue={DEMO_GUEST.guestEmail}
+              readOnly
               className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-sm font-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
             />
           </label>
@@ -121,8 +139,9 @@ export function BookingPage() {
               name="guestPhone"
               type="tel"
               required
-              autoComplete="tel"
-              placeholder="+41 61 261 00 00"
+              autoComplete="off"
+              defaultValue={DEMO_GUEST.guestPhone}
+              readOnly
               className="border border-[#1F1E1D]/20 bg-[#FAF8F5] px-4 py-3.5 text-sm font-normal text-[#1F1E1D] transition-colors duration-200 focus:outline-none focus:border-[#1F1E1D] focus:bg-white"
             />
           </label>
@@ -131,7 +150,7 @@ export function BookingPage() {
         {/* Demonstration policy banner */}
         <div className="bg-[#FAF8F5] border border-[#1F1E1D]/10 p-5 text-xs text-[#6C6862] leading-relaxed font-light">
           <strong className="text-[#1F1E1D] font-medium block mb-1">Demonstration Site · Safe by Design</strong>
-          No credit card or payment is required. Once submitted, your suite will be placed on a 15-minute temporary hold until you confirm on the next screen.
+          No payment is taken and no email is sent. Your demo room is held for 15 minutes while you review and confirm on the next screen.
         </div>
 
         {errorMessage && (

@@ -1,94 +1,147 @@
-import { useState } from "react";
-import { isoDateFromToday } from "../lib/format";
+import { type KeyboardEvent, useId, useLayoutEffect, useRef, useState } from "react";
+import { addDays, isCalendarDate } from "../lib/calendar-dates";
+import { formatDate, isoDateFromToday } from "../lib/format";
+import { DateCalendar } from "./date-calendar";
+import "./search-form.css";
 
-const DEFAULT_CHECK_IN_OFFSET_DAYS = 14;
-const DEFAULT_STAY_NIGHTS = 2;
+type Picker = "checkIn" | "checkOut" | "adults";
+const SHORT_DATE = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 const MAX_ADULTS = 4;
 
-/** Architectural search console inspired by Lingers boutique booking interface. */
+function Chevron() {
+  return <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" strokeWidth="1.25" /></svg>;
+}
+
 export function SearchForm(props: { checkIn?: string; checkOut?: string; adults?: string }) {
-  const [checkIn, setCheckIn] = useState(props.checkIn ?? isoDateFromToday(DEFAULT_CHECK_IN_OFFSET_DAYS));
-  const [checkOut, setCheckOut] = useState(props.checkOut ?? isoDateFromToday(DEFAULT_CHECK_IN_OFFSET_DAYS + DEFAULT_STAY_NIGHTS));
-  const nextDay = new Date(`${checkIn}T00:00:00Z`);
-  nextDay.setUTCDate(nextDay.getUTCDate() + 1);
-  const earliestDeparture = Number.isNaN(nextDay.getTime()) ? isoDateFromToday(1) : nextDay.toISOString().slice(0, 10);
-  const adults = props.adults ?? "2";
+  const today = isoDateFromToday(0);
+  const [checkIn, setCheckIn] = useState(() => isCalendarDate(props.checkIn) && props.checkIn >= today ? props.checkIn : addDays(today, 14));
+  const [checkOut, setCheckOut] = useState(() => isCalendarDate(props.checkOut) && props.checkOut > checkIn ? props.checkOut : addDays(checkIn, 2));
+  const [adults, setAdults] = useState(() => {
+    const count = Number(props.adults ?? 2);
+    return Number.isInteger(count) && count >= 1 && count <= MAX_ADULTS ? count : 2;
+  });
+  const [picker, setPicker] = useState<Picker | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const dialogId = useId();
+  const titleId = useId();
+
+  useLayoutEffect(() => {
+    if (!picker) return;
+    const dialog = dialogRef.current!;
+    const trigger = triggerRef.current;
+    const root = document.documentElement;
+    const previousOverflow = root.style.overflow;
+    root.style.overflow = "hidden";
+    dialog.showModal();
+
+    function position() {
+      if (!trigger) return;
+      const anchor = trigger.getBoundingClientRect();
+      const panel = dialog.getBoundingClientRect();
+      const left = Math.max(12, Math.min(anchor.left, innerWidth - panel.width - 12));
+      let top = anchor.bottom + 8;
+      if (top + panel.height > innerHeight - 12) top = Math.max(12, anchor.top - panel.height - 8);
+      dialog.style.setProperty("--picker-left", `${left}px`);
+      dialog.style.setProperty("--picker-top", `${top}px`);
+    }
+    position();
+    dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    window.addEventListener("resize", position);
+    return () => {
+      window.removeEventListener("resize", position);
+      dialog.close();
+      root.style.overflow = previousOverflow;
+      trigger?.focus({ preventScroll: true });
+    };
+  }, [picker]);
+
+  function openPicker(field: Picker, trigger: HTMLButtonElement) {
+    triggerRef.current = trigger;
+    setPicker(field);
+  }
+
+  function selectDate(date: string) {
+    if (picker === "checkIn") {
+      setCheckIn(date);
+      if (date >= checkOut) setCheckOut(addDays(date, 1));
+    } else {
+      setCheckOut(date);
+    }
+    setPicker(null);
+  }
+
+  function moveGuestFocus(event: KeyboardEvent<HTMLButtonElement>, guest: number) {
+    let next: number;
+    switch (event.key) {
+      case "ArrowDown": case "ArrowRight": next = guest % MAX_ADULTS + 1; break;
+      case "ArrowUp": case "ArrowLeft": next = (guest + MAX_ADULTS - 2) % MAX_ADULTS + 1; break;
+      case "Home": next = 1; break;
+      case "End": next = MAX_ADULTS; break;
+      default: return;
+    }
+    event.preventDefault();
+    dialogRef.current?.querySelector<HTMLButtonElement>(`[data-guests="${next}"]`)?.focus();
+  }
+
+  function keepFocusInPicker(event: KeyboardEvent<HTMLDialogElement>) {
+    if (event.key !== "Tab") return;
+    const stops = [...event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)")].filter((button) => button.tabIndex >= 0);
+    const current = stops.indexOf(document.activeElement as HTMLButtonElement);
+    const next = event.shiftKey ? (current <= 0 ? stops.length - 1 : current - 1) : (current + 1) % stops.length;
+    event.preventDefault();
+    stops[next]?.focus();
+  }
 
   return (
-    <form
-      action="/rooms"
-      method="get"
-      className="bg-white border border-[#1F1E1D]/15 shadow-xl shadow-black/5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[#1F1E1D]/10 animate-search-bar"
-      aria-label="Search available rooms"
-    >
-      {/* 1. Arrival */}
-      <label className="flex flex-col justify-center px-6 py-4 hover:bg-[#FAF8F5] transition-colors duration-200 cursor-pointer group">
-        <span className="font-brand text-xs uppercase tracking-[0.22em] font-medium text-[#6E5339] group-hover:text-[#1F1E1D] transition-colors">
-          Arrival
-        </span>
-        <input
-          type="date"
-          name="checkIn"
-          value={checkIn}
-          min={isoDateFromToday(0)}
-          onChange={(event) => {
-            const value = event.target.value;
-            setCheckIn(value);
-            if (value && value >= checkOut) {
-              const departure = new Date(`${value}T00:00:00Z`);
-              departure.setUTCDate(departure.getUTCDate() + 1);
-              setCheckOut(departure.toISOString().slice(0, 10));
-            }
-          }}
-          required
-          className="w-full bg-transparent text-sm font-medium text-[#1F1E1D] focus-visible:outline-2 focus-visible:outline-offset-4 cursor-pointer mt-1"
-        />
-      </label>
+    <form action="/rooms" method="get" className="stay-form" aria-label="Search available rooms" data-ui>
+      {/* Preserve the named native fields for form submission and site analysis. */}
+      <input hidden type="date" name="checkIn" value={checkIn} min={today} readOnly />
+      <input hidden type="date" name="checkOut" value={checkOut} min={addDays(checkIn, 1)} readOnly />
+      <select hidden name="adults" value={adults} onChange={(event) => setAdults(Number(event.target.value))} aria-label="Number of guests">
+        {Array.from({ length: MAX_ADULTS }, (_, index) => <option key={index + 1} value={index + 1}>{index + 1}</option>)}
+      </select>
 
-      {/* 2. Departure */}
-      <label className="flex flex-col justify-center px-6 py-4 hover:bg-[#FAF8F5] transition-colors duration-200 cursor-pointer group">
-        <span className="font-brand text-xs uppercase tracking-[0.22em] font-medium text-[#6E5339] group-hover:text-[#1F1E1D] transition-colors">
-          Departure
-        </span>
-        <input
-          type="date"
-          name="checkOut"
-          value={checkOut}
-          min={earliestDeparture}
-          onChange={(event) => setCheckOut(event.target.value)}
-          required
-          className="w-full bg-transparent text-sm font-medium text-[#1F1E1D] focus-visible:outline-2 focus-visible:outline-offset-4 cursor-pointer mt-1"
-        />
-      </label>
+      {(["checkIn", "checkOut"] as const).map((field) => {
+        const date = field === "checkIn" ? checkIn : checkOut;
+        const label = field === "checkIn" ? "Arrival" : "Departure";
+        return (
+          <button key={field} type="button" className="stay-field" aria-label={`${label}, ${formatDate(date)}`} aria-haspopup="dialog" aria-controls={dialogId} aria-expanded={picker === field} onClick={(event) => openPicker(field, event.currentTarget)}>
+            <span className="stay-field-label">{label}</span><Chevron />
+            <span className="stay-field-value">{SHORT_DATE.format(new Date(`${date}T00:00:00Z`))}<small>{date.slice(0, 4)}</small></span>
+          </button>
+        );
+      })}
+      <button type="button" className="stay-field stay-guests" aria-label={`Guests, ${adults} ${adults === 1 ? "guest" : "guests"}`} aria-haspopup="dialog" aria-controls={dialogId} aria-expanded={picker === "adults"} onClick={(event) => openPicker("adults", event.currentTarget)}>
+        <span className="stay-field-label">Guests</span><Chevron />
+        <span className="stay-field-value">{adults} {adults === 1 ? "guest" : "guests"}</span>
+      </button>
+      <button type="submit" className="stay-search-submit"><span>Check availability</span><span aria-hidden="true">↗</span></button>
 
-      {/* 3. Guests */}
-      <label className="flex flex-col justify-center px-6 py-4 hover:bg-[#FAF8F5] transition-colors duration-200 cursor-pointer group">
-        <span className="font-brand text-xs uppercase tracking-[0.22em] font-medium text-[#6E5339] group-hover:text-[#1F1E1D] transition-colors">
-          Guests
-        </span>
-        <select
-          name="adults"
-          defaultValue={adults}
-          className="w-full bg-transparent text-sm font-medium text-[#1F1E1D] focus-visible:outline-2 focus-visible:outline-offset-4 cursor-pointer mt-1"
-        >
-          {Array.from({ length: MAX_ADULTS }, (_, index) => (
-            <option key={index + 1} value={index + 1} className="bg-white text-[#1F1E1D]">
-              {index + 1} {index === 0 ? "Guest (Solo)" : "Guests"}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      {/* 4. Action Button */}
-      <div className="w-full flex items-stretch">
-        <button
-          type="submit"
-          className="w-full bg-[#1F1E1D] hover:bg-[#6E5339] text-[#FAF8F5] px-6 py-5 text-xs uppercase tracking-[0.24em] font-medium flex items-center justify-center gap-3 transition-colors duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F1E1D]"
-        >
-          <span>Check Availability</span>
-          <span aria-hidden="true" className="text-sm">→</span>
-        </button>
-      </div>
+      <dialog ref={dialogRef} id={dialogId} className={`stay-picker${picker === "adults" ? " guest-picker" : ""}`} aria-labelledby={titleId} data-lenis-prevent onKeyDown={keepFocusInPicker} onCancel={(event) => { event.preventDefault(); setPicker(null); }} onClick={(event) => {
+        if (event.target !== event.currentTarget) return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) setPicker(null);
+      }}>
+        {picker && <>
+          <div className="picker-heading">
+            <h2 id={titleId}>{picker === "adults" ? "Your guests" : picker === "checkIn" ? "Your arrival" : "Your departure"}</h2>
+            <button type="button" className="picker-icon-button" aria-label="Close picker" onClick={() => setPicker(null)}><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="m4 4 10 10M14 4 4 14" stroke="currentColor" strokeWidth="1.25" /></svg></button>
+          </div>
+          <div className="picker-body">{picker === "adults" ? (
+            <div role="listbox" aria-label="Number of guests" className="guest-options">
+              {Array.from({ length: MAX_ADULTS }, (_, index) => index + 1).map((guest) => (
+                <button key={guest} type="button" role="option" aria-selected={guest === adults} tabIndex={guest === adults ? 0 : -1} data-autofocus={guest === adults || undefined} data-guests={guest} onKeyDown={(event) => moveGuestFocus(event, guest)} onClick={() => { setAdults(guest); setPicker(null); }}>
+                  <span>{guest} {guest === 1 ? "guest" : "guests"}</span>
+                  {guest === adults && <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="m3 9 4 4 8-8" stroke="currentColor" strokeWidth="1.4" /></svg>}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <DateCalendar key={picker} value={picker === "checkIn" ? checkIn : checkOut} min={picker === "checkIn" ? today : addDays(checkIn, 1)} today={today} checkIn={checkIn} checkOut={checkOut} onSelect={selectDate} />
+          )}</div>
+        </>}
+      </dialog>
     </form>
   );
 }

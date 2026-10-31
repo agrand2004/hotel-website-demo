@@ -10,11 +10,12 @@ const DEFAULT_STAY_NIGHTS = 2;
 export function RoomDetailPage() {
   const { roomId } = useParams();
   const [params] = useSearchParams();
-  const resource = useApiResource<{ room: Room }>(roomId ? `/api/rooms/${roomId}` : null);
 
   const checkIn = params.get("checkIn") || isoDateFromToday(DEFAULT_CHECK_IN_OFFSET_DAYS);
   const checkOut = params.get("checkOut") || isoDateFromToday(DEFAULT_CHECK_IN_OFFSET_DAYS + DEFAULT_STAY_NIGHTS);
   const adults = params.get("adults") || "2";
+  const stayQuery = new URLSearchParams({ checkIn, checkOut, adults }).toString();
+  const resource = useApiResource<{ room: Room }>(roomId ? `/api/rooms/${roomId}?${stayQuery}` : null);
 
   const bookingQuery = new URLSearchParams({
     roomId: roomId ?? "",

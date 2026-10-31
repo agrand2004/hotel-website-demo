@@ -36,7 +36,7 @@ export function RoomsPage() {
 
       {/* Architectural search console */}
       <div className="pt-2">
-        <SearchForm checkIn={checkIn} checkOut={checkOut} adults={adults} />
+        <SearchForm key={stayQuery} checkIn={checkIn} checkOut={checkOut} adults={adults} />
       </div>
 
       <section aria-label="Available rooms" className="space-y-8 pt-4">
@@ -70,7 +70,7 @@ export function RoomsPage() {
               <div className="border border-[#1F1E1D]/10 bg-white p-12 text-center space-y-4 max-w-xl mx-auto shadow-sm">
                 <h2 className="font-serif text-2xl font-light text-[#1F1E1D]">No suites available for these dates</h2>
                 <p className="text-xs text-[#6C6862] leading-relaxed font-light">
-                  With only ten residences, availability is limited. Please select alternative dates or contact our concierge directly.
+                  Please try different dates or fewer guests using the search form above.
                 </p>
               </div>
             ) : (

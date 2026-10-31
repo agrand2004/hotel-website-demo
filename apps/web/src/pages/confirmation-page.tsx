@@ -9,18 +9,22 @@ import { useApiResource } from "../lib/use-api-resource";
 export function ConfirmationPage() {
   const { bookingId } = useParams();
   const resource = useApiResource<{ booking: Booking }>(bookingId ? `/api/bookings/${bookingId}` : null);
-  const [confirmed, setConfirmed] = useState<Booking | null>(null);
+  const [updatedBooking, setUpdatedBooking] = useState<Booking | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
 
   async function handleConfirm() {
+    if (confirming) return;
     setConfirming(true);
     setErrorMessage(null);
     try {
       const { booking } = await apiPost<{ booking: Booking }>(`/api/bookings/${bookingId}/confirm`);
-      setConfirmed(booking);
+      setUpdatedBooking(booking);
     } catch (error) {
-      setErrorMessage(error instanceof ApiError ? error.message : "Could not reach the server.");
+      setErrorMessage(error instanceof ApiError ? error.message : "Could not confirm the demo reservation. Please try again.");
+      if (error instanceof ApiError && error.code === "booking_hold_expired" && resource.status === "success") {
+        setUpdatedBooking({ ...resource.data.booking, status: "expired", holdUntil: null });
+      }
     } finally {
       setConfirming(false);
     }
@@ -43,21 +47,22 @@ export function ConfirmationPage() {
         <p role="alert" className="border border-red-300 bg-red-50 p-4 text-xs text-red-800">
           {resource.error.message}
         </p>
+        <Link to="/rooms" className="inline-block text-[11px] uppercase tracking-[0.2em] text-[#1F1E1D] underline">Choose a room →</Link>
       </main>
     );
   }
 
-  const booking = confirmed ?? resource.data.booking;
+  const booking = updatedBooking && updatedBooking.id === bookingId ? updatedBooking : resource.data.booking;
   const isConfirmed = booking.status === "confirmed";
 
   return (
     <main className="mx-auto max-w-2xl space-y-10 px-6 py-12 md:py-20">
       <div className="space-y-3">
         <span className="font-brand text-[10px] uppercase tracking-[0.26em] text-[#8F7255] font-semibold block">
-          {isConfirmed ? "Confirmed Voucher" : "Step 2 of 2 · Explicit Confirmation"}
+          {isConfirmed ? "Demo Confirmation" : booking.status === "expired" ? "Reservation expired" : "Step 2 of 2 · Explicit Confirmation"}
         </span>
         <h1 className="font-serif text-4xl sm:text-5xl text-[#1F1E1D] tracking-tight font-light">
-          {isConfirmed ? "Reservation confirmed" : "Review & confirm"}
+          {isConfirmed ? "Reservation confirmed" : booking.status === "expired" ? "Your hold has expired" : "Review & confirm"}
         </h1>
         <div className="bronze-line"></div>
       </div>
@@ -72,7 +77,7 @@ export function ConfirmationPage() {
               <p className="font-serif text-2xl sm:text-3xl font-light text-[#1F1E1D]">
                 Thank you, {booking.guestName}.
               </p>
-              <p className="text-xs text-[#6C6862] font-light mt-0.5">Your stay at Rheinblick is officially booked.</p>
+              <p className="text-xs text-[#6C6862] font-light mt-0.5">Your fictional stay at Rheinblick is confirmed for this demo.</p>
             </div>
           </div>
 
@@ -80,7 +85,7 @@ export function ConfirmationPage() {
           <div className="bg-[#FAF8F5] border border-[#1F1E1D]/12 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span className="text-[10px] uppercase tracking-[0.22em] text-[#8F7255] font-semibold block">
-                Official Reference Code
+                Demo Reference Code
               </span>
               <span className="font-mono text-2xl font-medium text-[#1F1E1D] tracking-widest mt-1 block">
                 {booking.reference}
@@ -88,18 +93,25 @@ export function ConfirmationPage() {
             </div>
             <div className="text-left sm:text-right">
               <span className="text-[10px] uppercase tracking-[0.2em] text-[#6C6862] font-medium block">Booking Status</span>
-              <span className="text-xs text-[#1F1E1D] font-medium uppercase tracking-wider block mt-1">Confirmed &amp; Guaranteed</span>
+              <span className="text-xs text-[#1F1E1D] font-medium uppercase tracking-wider block mt-1">Confirmed · Demo only</span>
             </div>
           </div>
 
           <div className="space-y-2 text-xs text-[#6C6862] leading-relaxed font-light pt-2">
-            <p>A digital voucher has been registered for <strong>{booking.guestEmail}</strong>.</p>
-            <p>Check-in opens at 15:00 at Rheinsprung 1, Basel. Our concierge is available at <strong>concierge@hotel-rheinblick-basel.ch</strong>.</p>
+            <p>No payment has been taken and no email has been sent.</p>
+            <p>This demonstration reservation is saved in this browser tab only.</p>
           </div>
         </div>
       ) : null}
 
       <BookingSummary booking={booking} />
+
+      {booking.status === "expired" && (
+        <div className="space-y-4 text-sm text-[#6C6862]">
+          <p role="alert">Your 15-minute hold has expired. Please check availability and choose your room again.</p>
+          <Link to={`/rooms?${new URLSearchParams({ checkIn: booking.checkIn, checkOut: booking.checkOut, adults: String(booking.adults) })}`} className="inline-block text-[11px] uppercase tracking-[0.2em] text-[#1F1E1D] underline">Check availability →</Link>
+        </div>
+      )}
 
       {booking.status === "pending" && (
         <div className="bg-white border border-[#1F1E1D]/15 p-8 sm:p-10 shadow-lg shadow-black/5 space-y-6">
@@ -108,7 +120,7 @@ export function ConfirmationPage() {
               Safe By Design Policy
             </span>
             <p>
-              Your suite is temporarily held for 15 minutes. In accordance with our agent safety principles, no irreversible booking occurs until you explicitly confirm below.
+              Your demo suite is temporarily held for 15 minutes. Review your dates and total, then confirm below to complete this fictional reservation.
             </p>
           </div>
 
@@ -123,7 +135,7 @@ export function ConfirmationPage() {
               to="/rooms"
               className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6862] hover:text-[#1F1E1D] text-center sm:text-left"
             >
-              Cancel &amp; Return
+              Browse other rooms
             </Link>
             <button
               type="button"

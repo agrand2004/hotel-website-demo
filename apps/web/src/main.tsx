@@ -12,6 +12,11 @@ import "./index.css";
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing #root element");
 
+// Clear old homepage section URLs before the router and the browser resolve their anchors.
+if (window.location.pathname === "/" && window.location.hash) {
+  window.history.replaceState(window.history.state, "", window.location.pathname + window.location.search);
+}
+
 createRoot(root).render(
   <StrictMode>
     <BrowserRouter>

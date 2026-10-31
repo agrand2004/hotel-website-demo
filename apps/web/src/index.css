@@ -127,12 +127,6 @@ button, input, select { font: inherit; }
 .text-link:hover { color: #1F1E1D; }
 .light-link, .light-link:hover { color: #FAF8F5; }
 .stay-search { padding: 0 6%; background: #F3EFEA; scroll-margin-top: 20px; }
-.stay-search form { box-shadow: none; border: 0; background: transparent; }
-.stay-search form label { padding: 28px 26px; }
-.stay-search form label > span { font-family: var(--font-sans); text-transform: none; letter-spacing: 0; font-size: 13px; color: #57534D; }
-.stay-search form input, .stay-search form select { font-family: var(--font-serif); font-size: 23px; font-weight: 400; }
-.stay-search form button { font-family: var(--font-sans); letter-spacing: 0; text-transform: none; font-size: 14px; background: #6E5339; }
-.stay-search form button:hover { background: #1F1E1D; }
 .residence-intro { padding-block: 130px 115px; display: grid; grid-template-columns: repeat(12, 1fr); gap: 50px 24px; align-items: start; }
 .intro-title { grid-column: 2 / 8; }
 .intro-story { grid-column: 8 / 13; padding-top: 8px; max-width: 430px; }
@@ -210,11 +204,6 @@ button, input, select { font: inherit; }
   .arrival-copy p { font-size: 14px; margin-top: 24px; }
   .arrival-location { display: none; } .arrival-scroll { bottom: 25px; }
   .stay-search { padding: 14px 6%; }
-  .stay-search form { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .stay-search form label { padding: 12px 4px; border: 0; }
-  .stay-search form input, .stay-search form select { font-size: 19px; min-height: 32px; min-width: 0; }
-  .stay-search form > div { min-height: 72px; }
-  .stay-search form button { padding: 12px; font-size: 13px; gap: 6px; }
   .residence-home h2 { font-size: clamp(38px, 9.7vw, 52px); }
   .residence-home p { font-size: 14px; }
   .residence-intro { padding-block: 75px; gap: 30px 14px; }
@@ -270,11 +259,6 @@ button, input, select { font: inherit; }
 .arrival-photograph img { object-position: center 55%; }
 .arrival-photograph::after { background: rgb(15 18 17 / .46); }
 @media (max-width: 1000px) { .residence-wordmark small { font-size: 13px; } }
-@media (max-width: 700px) {
-  .stay-search form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .stay-search form > * { min-width: 0; }
-  .stay-search form input { max-width: 100%; }
-}
 
 /* Timed entrance; scroll reveals use IntersectionObserver across browsers. */
 @media (prefers-reduced-motion: no-preference) {
