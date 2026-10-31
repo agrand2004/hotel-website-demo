@@ -5,7 +5,7 @@ import { BookingSummary } from "../components/booking-summary";
 import { ApiError, apiPost } from "../lib/api";
 import { useApiResource } from "../lib/use-api-resource";
 
-/** Recap of a pending booking with the explicit confirmation step, then the confirmed booking. */
+/** Recap of a pending booking with explicit human confirmation step, then the confirmed voucher. */
 export function ConfirmationPage() {
   const { bookingId } = useParams();
   const resource = useApiResource<{ booking: Booking }>(bookingId ? `/api/bookings/${bookingId}` : null);
@@ -26,38 +26,126 @@ export function ConfirmationPage() {
     }
   }
 
-  if (resource.status === "loading") return <main className="mx-auto max-w-2xl p-6">Loading booking…</main>;
+  if (resource.status === "loading") {
+    return (
+      <main className="mx-auto max-w-2xl px-6 py-24 text-center">
+        <div className="inline-block h-6 w-6 animate-spin border border-[#1F1E1D]/20 border-t-[#1F1E1D]"></div>
+        <p className="text-[11px] uppercase tracking-[0.22em] text-[#6C6862] font-medium mt-3">
+          Loading booking details…
+        </p>
+      </main>
+    );
+  }
+
   if (resource.status === "error") {
     return (
-      <main className="mx-auto max-w-2xl p-6">
-        <p role="alert">{resource.error.message}</p>
+      <main className="mx-auto max-w-2xl px-6 py-16 space-y-4">
+        <p role="alert" className="border border-red-300 bg-red-50 p-4 text-xs text-red-800">
+          {resource.error.message}
+        </p>
       </main>
     );
   }
 
   const booking = confirmed ?? resource.data.booking;
   const isConfirmed = booking.status === "confirmed";
+
   return (
-    <main className="mx-auto max-w-2xl space-y-6 px-6 py-10">
-      <h1 className="font-serif text-3xl">{isConfirmed ? "Booking confirmed" : "Review your booking"}</h1>
-      {isConfirmed && (
-        <p>
-          Thank you, {booking.guestName}. Your reference is <strong>{booking.reference}</strong>.
-        </p>
-      )}
+    <main className="mx-auto max-w-2xl space-y-10 px-6 py-12 md:py-20">
+      <div className="space-y-3">
+        <span className="font-brand text-[10px] uppercase tracking-[0.26em] text-[#8F7255] font-semibold block">
+          {isConfirmed ? "Confirmed Voucher" : "Step 2 of 2 · Explicit Confirmation"}
+        </span>
+        <h1 className="font-serif text-4xl sm:text-5xl text-[#1F1E1D] tracking-tight font-light">
+          {isConfirmed ? "Reservation confirmed" : "Review & confirm"}
+        </h1>
+        <div className="bronze-line"></div>
+      </div>
+
+      {isConfirmed ? (
+        <div className="bg-white border border-[#1F1E1D]/15 p-8 sm:p-10 shadow-lg shadow-black/5 space-y-6">
+          <div className="flex items-center gap-4 border-b border-[#1F1E1D]/10 pb-6">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-[#1F1E1D] bg-[#1F1E1D] text-[#FAF8F5] text-sm">
+              ✓
+            </span>
+            <div>
+              <p className="font-serif text-2xl sm:text-3xl font-light text-[#1F1E1D]">
+                Thank you, {booking.guestName}.
+              </p>
+              <p className="text-xs text-[#6C6862] font-light mt-0.5">Your stay at Rheinblick is officially booked.</p>
+            </div>
+          </div>
+
+          {/* Reference Voucher Card */}
+          <div className="bg-[#FAF8F5] border border-[#1F1E1D]/12 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span className="text-[10px] uppercase tracking-[0.22em] text-[#8F7255] font-semibold block">
+                Official Reference Code
+              </span>
+              <span className="font-mono text-2xl font-medium text-[#1F1E1D] tracking-widest mt-1 block">
+                {booking.reference}
+              </span>
+            </div>
+            <div className="text-left sm:text-right">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[#6C6862] font-medium block">Booking Status</span>
+              <span className="text-xs text-[#1F1E1D] font-medium uppercase tracking-wider block mt-1">Confirmed &amp; Guaranteed</span>
+            </div>
+          </div>
+
+          <div className="space-y-2 text-xs text-[#6C6862] leading-relaxed font-light pt-2">
+            <p>A digital voucher has been registered for <strong>{booking.guestEmail}</strong>.</p>
+            <p>Check-in opens at 15:00 at Rheinsprung 1, Basel. Our concierge is available at <strong>concierge@hotel-rheinblick-basel.ch</strong>.</p>
+          </div>
+        </div>
+      ) : null}
+
       <BookingSummary booking={booking} />
+
       {booking.status === "pending" && (
-        <>
-          <p className="text-sm">Your room is held for 15 minutes. Nothing is booked until you confirm.</p>
-          {errorMessage && <p role="alert" className="text-red-700">{errorMessage}</p>}
-          <button type="button" onClick={handleConfirm} disabled={confirming} className="rounded bg-forest px-6 py-3 text-cream hover:opacity-90 disabled:opacity-50">
-            Confirm booking
-          </button>
-        </>
+        <div className="bg-white border border-[#1F1E1D]/15 p-8 sm:p-10 shadow-lg shadow-black/5 space-y-6">
+          <div className="space-y-2 text-xs text-[#6C6862] leading-relaxed font-light border-b border-[#1F1E1D]/10 pb-5">
+            <span className="font-brand text-[10px] uppercase tracking-[0.24em] text-[#8F7255] font-semibold block">
+              Safe By Design Policy
+            </span>
+            <p>
+              Your suite is temporarily held for 15 minutes. In accordance with our agent safety principles, no irreversible booking occurs until you explicitly confirm below.
+            </p>
+          </div>
+
+          {errorMessage && (
+            <p role="alert" className="text-xs text-red-800 bg-red-50 p-4 border border-red-300">
+              {errorMessage}
+            </p>
+          )}
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <Link
+              to="/rooms"
+              className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6862] hover:text-[#1F1E1D] text-center sm:text-left"
+            >
+              Cancel &amp; Return
+            </Link>
+            <button
+              type="button"
+              onClick={handleConfirm}
+              disabled={confirming}
+              className="bg-[#1F1E1D] hover:bg-[#8F7255] text-[#FAF8F5] px-8 py-4 text-[11px] uppercase tracking-[0.22em] font-medium transition-colors duration-300 disabled:opacity-50 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F1E1D] text-center"
+            >
+              {confirming ? "Confirming…" : "Confirm Reservation (Free Demo) →"}
+            </button>
+          </div>
+        </div>
       )}
-      {booking.status === "expired" && <p role="alert">This booking has expired. Please start a new search.</p>}
-      {(isConfirmed || booking.status === "expired") && (
-        <Link to="/" className="underline">Back to home</Link>
+
+      {isConfirmed && (
+        <div className="text-center pt-4">
+          <Link
+            to="/"
+            className="inline-block border border-[#1F1E1D] text-[#1F1E1D] hover:bg-[#1F1E1D] hover:text-[#FAF8F5] px-8 py-3.5 text-[10px] uppercase tracking-[0.22em] font-medium transition-colors duration-300"
+          >
+            Return to Homepage
+          </Link>
+        </div>
       )}
     </main>
   );
