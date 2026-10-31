@@ -1,0 +1,28 @@
+.cursor-halo { display: none; }
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .cursor-halo {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 32px;
+    height: 32px;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: transform .12s ease-out, opacity .15s ease-out;
+  }
+  .cursor-halo[data-visible="true"] { opacity: .8; }
+  .cursor-halo > span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #8F7255;
+    border-radius: 50%;
+    transition: transform .18s ease-out;
+  }
+  .cursor-halo[data-interactive="true"] > span { transform: scale(1.4); }
+  .cursor-halo[data-pressed="true"] > span { transform: scale(.8); }
+  body:has(dialog[open]) .cursor-halo { opacity: 0; }
+}

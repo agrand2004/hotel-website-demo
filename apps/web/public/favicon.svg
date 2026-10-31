@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Rheinblick</title>
+  <rect width="64" height="64" rx="2" fill="#8F7255" />
+  <path fill="#FAF8F5" fill-rule="evenodd" d="M10 12h23c12 0 18 5 18 14 0 7-4 11-11 13l11 12h4v3H42L29 39h-4v9c0 3 1 4 4 4h2v2H10v-2h3c3 0 4-1 4-4V18c0-3-1-4-4-4h-3zm15 4v19h6c8 0 12-3 12-9 0-7-4-10-12-10z" />
+</svg>

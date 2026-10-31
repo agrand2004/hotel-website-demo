@@ -1,14 +1,6 @@
-/** Error thrown for any non-2xx response of the API. */
-export class ApiError extends Error {
-  public readonly status: number;
-  public readonly code: string;
+import { ApiError } from "./api-error";
 
-  public constructor(params: { status: number; code: string; message: string }) {
-    super(params.message);
-    this.status = params.status;
-    this.code = params.code;
-  }
-}
+export { ApiError } from "./api-error";
 
 async function parseResponse<T>(response: Response): Promise<T> {
   const body = await response.json().catch(() => null);

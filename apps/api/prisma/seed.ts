@@ -22,10 +22,10 @@ const ROOMS = [
 /**
  * Builds the URL of a room photo served by the web app from `apps/web/public/rooms/`.
  * @param roomName - room name, e.g. `Cosy Single`
- * @returns the public path, e.g. `/rooms/cosy-single.jpg`
+ * @returns the public path, e.g. `/rooms/cosy-single-1200.webp`
  */
 function roomImageUrl(roomName: string): string {
-  return `/rooms/${roomName.toLowerCase().replaceAll(" ", "-")}.jpg`;
+  return `/rooms/${roomName.toLowerCase().replaceAll(" ", "-")}-1200.webp`;
 }
 
 async function main() {
