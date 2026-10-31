@@ -19,13 +19,20 @@ const ROOMS = [
   { name: "Rhine Penthouse Suite", type: "Suite", capacity: 3, pricePerNight: 450, description: "Top-floor suite with a private terrace." },
 ] as const;
 
+/**
+ * Builds the URL of a room photo served by the web app from `apps/web/public/rooms/`.
+ * @param roomName - room name, e.g. `Cosy Single`
+ * @returns the public path, e.g. `/rooms/cosy-single.jpg`
+ */
+function roomImageUrl(roomName: string): string {
+  return `/rooms/${roomName.toLowerCase().replaceAll(" ", "-")}.jpg`;
+}
+
 async function main() {
   await prisma.booking.deleteMany();
   await prisma.room.deleteMany();
-  for (const [index, room] of ROOMS.entries()) {
-    await prisma.room.create({
-      data: { ...room, imageUrl: `https://picsum.photos/seed/rheinblick-${index + 1}/800/600` },
-    });
+  for (const room of ROOMS) {
+    await prisma.room.create({ data: { ...room, imageUrl: roomImageUrl(room.name) } });
   }
   console.log(`Seeded ${ROOMS.length} rooms.`);
 }
