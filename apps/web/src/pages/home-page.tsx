@@ -4,9 +4,9 @@ import { SearchForm } from "../components/search-form";
 import { useScrollReveal } from "../lib/use-scroll-reveal";
 
 const rooms = [
-  { name: "Rhine Penthouse Suite", image: "penthouse", description: "A top-floor suite with a private terrace.", price: 450 },
-  { name: "Rhine View Double", image: "river-room", description: "A double room with a balcony over the Rhine.", price: 240 },
-  { name: "Classic Double", image: "classic", description: "A queen bed, rain shower and views over the old town.", price: 180 },
+  { name: "Rhine Penthouse Suite", image: "rhine-penthouse-suite", imageHeight: 800, description: "A top-floor suite with a private terrace.", price: 450 },
+  { name: "Rhine View Double", image: "rhine-view-double", imageHeight: 800, description: "A double room with a balcony over the Rhine.", price: 240 },
+  { name: "Classic Double", image: "classic-double", imageHeight: 900, description: "A queen bed, rain shower and views over the old town.", price: 180 },
 ] as const;
 
 function Arrow() {
@@ -46,14 +46,14 @@ export function HomePage() {
           <a href="#rooms" className="text-link">Meet your room <Arrow /></a>
         </div>
         <figure className="intro-wide"><img data-reveal="photo" src="/images/old-town-1280.webp" srcSet="/images/old-town-640.webp 640w, /images/old-town-1280.webp 1280w, /images/old-town-1920.webp 1920w" sizes="(max-width: 700px) 74vw, 60vw" decoding="async" alt="A quiet lane in Basel’s old town" loading="lazy" width="1600" height="2133" /></figure>
-        <figure className="intro-detail"><img data-reveal="photo" src="/images/classic-1280.webp" srcSet="/images/classic-640.webp 640w, /images/classic-1280.webp 1280w, /images/classic-1920.webp 1920w" sizes="(max-width: 700px) 44vw, 25vw" decoding="async" alt="Illustrative bedroom with natural textiles and soft daylight" loading="lazy" width="1600" height="1067" /><figcaption>A quieter place to come back to.</figcaption></figure>
+        <figure className="intro-detail"><img data-reveal="photo" src="/rooms/classic-double.jpg" decoding="async" alt="Illustrative interior of the Classic Double" loading="lazy" width="1200" height="900" /><figcaption>A quieter place to come back to.</figcaption></figure>
         <p data-reveal="copy" className="intro-note">Outside, the city.<br />Inside, your own rhythm.</p>
       </section>
 
       <section id="moments" className="daily-moments" aria-labelledby="moments-title">
         <div className="moments-gallery editorial-frame">
           <figure className="moment-breakfast"><img data-reveal="photo" src="/images/breakfast-1280.webp" srcSet="/images/breakfast-640.webp 640w, /images/breakfast-1280.webp 1280w, /images/breakfast-1920.webp 1920w" sizes="(max-width: 700px) 67vw, (min-width: 1280px) 455px, 36vw" decoding="async" alt="Illustrative breakfast of eggs on toast with tomatoes" loading="lazy" width="1600" height="1067" /><figcaption>Mornings, without the hurry.</figcaption></figure>
-          <figure className="moment-room"><img data-reveal="photo" src="/images/river-room-1280.webp" srcSet="/images/river-room-640.webp 640w, /images/river-room-1280.webp 1280w, /images/river-room-1920.webp 1920w" sizes="(max-width: 700px) 78vw, (min-width: 1280px) 637px, 51vw" decoding="async" alt="Illustrative sunlit room with warm wood and a generous bed" loading="lazy" width="1600" height="1200" /><figcaption>Somewhere to do a little less.</figcaption></figure>
+          <figure className="moment-room"><img data-reveal="photo" src="/rooms/rhine-view-double.jpg" decoding="async" alt="Illustrative room with a balcony and water views" loading="lazy" width="1200" height="800" /><figcaption>Somewhere to do a little less.</figcaption></figure>
         </div>
         <div data-reveal="copy" className="moments-copy">
           <h2 id="moments-title">The little things.</h2>
@@ -68,14 +68,14 @@ export function HomePage() {
           {rooms.map((item, index) => <button key={item.name} type="button" aria-pressed={index === selectedRoom} onClick={() => setSelectedRoom(index)}>{item.name}</button>)}
         </div>
         <div className="room-preview">
-          <figure className="room-preview-image"><img data-reveal="photo" src={`/images/${room.image}-1280.webp`} srcSet={`/images/${room.image}-640.webp 640w, /images/${room.image}-1280.webp 1280w, /images/${room.image}-1920.webp 1920w`} sizes="(max-width: 700px) 88vw, 58vw" decoding="async" alt={`Illustrative interior for the ${room.name}`} loading="lazy" width="1600" height="1067" /></figure>
+          <figure className="room-preview-image"><img data-reveal="photo" src={`/rooms/${room.image}.jpg`} decoding="async" alt={`Illustrative interior for the ${room.name}`} loading="lazy" width="1200" height={room.imageHeight} /></figure>
           <div data-reveal="copy" className="room-preview-copy" aria-live="polite" aria-atomic="true"><h3>{room.name}</h3><p>{room.description}</p><p className="room-rate">From {room.price} CHF <span>/ night</span></p><Link className="text-link" to="/rooms">View all availability <Arrow /></Link></div>
         </div>
         <div data-reveal="copy" className="collection-close"><p>A room for a weekend.<br />A residence for a little longer.</p><Link to="/rooms" className="solid-link">Explore all rooms <Arrow /></Link></div>
       </section>
 
       <section className="stay-invitation" aria-labelledby="invitation-title">
-        <div className="invitation-photo"><img data-reveal="photo" src="/images/penthouse-1280.webp" srcSet="/images/penthouse-640.webp 640w, /images/penthouse-1280.webp 1280w, /images/penthouse-1920.webp 1920w" sizes="(max-width: 700px) 100vw, 50vw" decoding="async" alt="Illustrative warmly lit suite with a bed and lounge area" loading="lazy" width="1600" height="1067" /></div>
+        <div className="invitation-photo"><img data-reveal="photo" src="/rooms/rhine-penthouse-suite.jpg" decoding="async" alt="Illustrative suite with a dining area and a separate bedroom" loading="lazy" width="1200" height="800" /></div>
         <div data-reveal="copy" className="invitation-copy"><h2 id="invitation-title">Basel is calling.</h2><p>The river, the old town, the art.<br />And a room to make your own.</p><a href="#your-stay" className="text-link light-link">Let’s make it a stay <Arrow /></a></div>
       </section>
     </main>

@@ -14,6 +14,7 @@ export function RoomCard(props: { room: Room; stayQuery: string }) {
             src={room.imageUrl}
             alt={room.name}
             loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
           <div className="absolute top-4 left-4 border border-[#1F1E1D]/20 bg-white/95 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.24em] text-[#1F1E1D]">

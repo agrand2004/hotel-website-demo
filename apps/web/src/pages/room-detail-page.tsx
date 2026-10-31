@@ -70,6 +70,7 @@ export function RoomDetailPage() {
               <img
                 src={room.imageUrl}
                 alt={room.name}
+                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-103"
               />
             </div>
